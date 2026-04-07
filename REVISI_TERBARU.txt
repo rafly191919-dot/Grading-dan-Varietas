@@ -1,0 +1,15 @@
+Revisi terbaru mencakup:
+1. Login Firebase Email/Password dengan pilihan role Staff/Grading, email terisi otomatis.
+2. Sidebar mobile menjadi drawer yang bisa dibuka-tutup dengan overlay.
+3. Summary cards hanya tampil di Dashboard.
+4. Rekap Grading dan Rekap Tenera Dura memakai modal WhatsApp untuk Kirim Ringkasan/Kirim Detail.
+5. Filter WhatsApp mendukung tanggal, supplier (untuk grading), dan mode keseluruhan/per sopir.
+6. Data utama memakai Firebase Realtime Database (grading, td, suppliers).
+7. Spreadsheet Grading dan TD memiliki tombol hapus.
+
+Catatan:
+- Kode memakai Firebase modular SDK via CDN.
+- Untuk realtime data, pastikan Realtime Database sudah aktif dan rules mengizinkan user login membaca/menulis sesuai kebutuhan.
+- Role ditentukan dari email login:
+  staff@dura.local -> staff
+  grading@dura.local -> grading

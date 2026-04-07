@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PT Kedap Saayaq Dua - Sistem Operasional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-shell">
+      <div class="login-brand">
+        <div class="brand-icon large">🌴</div>
+        <div>
+          <h1>PT Kedap Saayaq Dua</h1>
+          <p>Sistem Operasional</p>
+        </div>
+      </div>
+      <div class="login-card">
+        <h2>Masuk ke Sistem</h2>
+        <div class="role-picker">
+          <button type="button" class="role-pick active" data-role="staff">Staff</button>
+          <button type="button" class="role-pick" data-role="grading">Grading</button>
+        </div>
+        <form id="loginForm" class="login-form">
+          <label>
+            <span>Email akun</span>
+            <input id="loginEmail" class="input readonly-input" type="email" readonly />
+          </label>
+          <label>
+            <span>Password</span>
+            <input id="loginPassword" class="input" type="password" placeholder="Masukkan password" required />
+          </label>
+          <button class="btn primary wide" type="submit">Login</button>
+          <div id="loginInfo" class="alert info small">Role Staff memakai akun staff@dura.local, role Grading memakai akun grading@dura.local.</div>
+          <div id="loginError" class="alert error hidden"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="app" class="app hidden">
+    <div id="mobileOverlay" class="mobile-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">🌴</div>
+        <div>
+          <h1>PT Kedap Saayaq Dua</h1>
+          <p>Sistem Operasional</p>
+        </div>
+      </div>
+
+      <div class="role-card">
+        <span>Login sebagai</span>
+        <strong id="roleLabel">STAFF</strong>
+        <small id="userEmail" class="role-email">staff@dura.local</small>
+        <button id="logoutBtn" class="ghost-btn">Logout</button>
+      </div>
+
+      <nav class="menu">
+        <button class="menu-item active" data-page="dashboard">Dashboard</button>
+        <button class="menu-item" data-page="grading">Input Grading</button>
+        <button class="menu-item" data-page="td">Input Tenera Dura</button>
+        <button class="menu-item" data-page="rekapGrading">Rekap Grading</button>
+        <button class="menu-item" data-page="rekapTD">Rekap Tenera Dura</button>
+        <button class="menu-item" data-page="rekapData">Rekap Data</button>
+        <button class="menu-item staff-only" data-page="sheetGrading">Spreadsheet Grading</button>
+        <button class="menu-item staff-only" data-page="sheetTD">Spreadsheet Tenera Dura</button>
+        <button class="menu-item staff-only" data-page="performance">Performance</button>
+        <button class="menu-item staff-only" data-page="analytics">Analytics</button>
+        <button class="menu-item staff-only" data-page="supplier">Supplier</button>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="menuToggle" class="menu-toggle" type="button">☰</button>
+          <div>
+            <h2 id="pageTitle">Dashboard</h2>
+            <p id="pageSubtitle">Ringkasan operasional grading, Tenera Dura, supplier, dan sopir.</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <input id="globalSearch" class="input search" placeholder="Cari sopir, plat, supplier..." />
+        </div>
+      </header>
+
+      <section id="appStatus" class="alert info hidden"></section>
+      <section id="summaryCards" class="summary-grid"></section>
+
+      <section id="page-dashboard" class="page active">
+        <div class="section-title">Ringkasan Utama</div>
+        <div class="grid cols-3">
+          <div class="card"><div class="card-head"><div><h3>Grading</h3><p>Fokus % kematangan dan potongan.</p></div></div><div id="dashGrading" class="metric-grid"></div></div>
+          <div class="card"><div class="card-head"><div><h3>Tenera Dura</h3><p>Modul berdiri sendiri.</p></div></div><div id="dashTD" class="metric-grid"></div></div>
+          <div class="card"><div class="card-head"><div><h3>Insight</h3><p>Kesimpulan otomatis ringkas.</p></div></div><div id="dashInsights" class="stack"></div></div>
+        </div>
+        <div class="grid cols-2">
+          <div class="card"><div class="card-head"><div><h3>Per Supplier</h3><p>Ringkasan grading per supplier.</p></div></div><div id="dashSuppliers" class="stack"></div></div>
+          <div class="card"><div class="card-head"><div><h3>Per Sopir</h3><p>Ringkasan grading per sopir.</p></div></div><div id="dashDrivers" class="stack"></div></div>
+        </div>
+      </section>
+
+      <section id="page-grading" class="page">
+        <div class="grid form-layout">
+          <div class="card sticky-card">
+            <div class="card-head"><div><h3>Input Grading</h3><p>Nama sopir dapat mengisi plat dan supplier dari histori.</p></div></div>
+            <form id="gradingForm" class="form-grid">
+              <label class="span-2"><span>Nama Sopir</span><input id="gradingDriver" class="input" name="driver" list="driverList" required /><datalist id="driverList"></datalist><small id="driverHint" class="hint">Belum ada histori sopir.</small></label>
+              <label><span>Plat Kendaraan</span><input id="gradingPlate" class="input" name="plate" required /></label>
+              <label><span>Supplier</span><select id="gradingSupplier" class="input" name="supplier" required></select></label>
+              <label class="span-2"><span>Total Janjang</span><input class="input" name="totalBunches" type="number" min="0" value="0" required /></label>
+              <label><span>Mentah</span><input class="input cat" name="mentah" type="number" min="0" value="0" /></label>
+              <label><span>Mengkal</span><input class="input cat" name="mengkal" type="number" min="0" value="0" /></label>
+              <label><span>Overripe</span><input class="input cat" name="overripe" type="number" min="0" value="0" /></label>
+              <label><span>Busuk</span><input class="input cat" name="busuk" type="number" min="0" value="0" /></label>
+              <label><span>Tandan Kosong</span><input class="input cat" name="kosong" type="number" min="0" value="0" /></label>
+              <label><span>Parthenocarpi</span><input class="input cat" name="partheno" type="number" min="0" value="0" /></label>
+              <label class="span-2"><span>Makan Tikus</span><input class="input cat" name="tikus" type="number" min="0" value="0" /></label>
+              <div class="form-actions span-2">
+                <button type="button" id="copyLastGrading" class="btn secondary">Copy Terakhir</button>
+                <button type="button" id="resetGradingBtn" class="btn secondary">Reset</button>
+                <button type="submit" class="btn primary">Simpan Grading</button>
+              </div>
+            </form>
+          </div>
+          <div class="stack">
+            <div class="card hot-card">
+              <div class="card-head"><div><h3>Total Potongan</h3><p>Pusat perhatian UI.</p></div></div>
+              <div id="gradingTotalDeduction" class="big-number">3.00%</div>
+              <div id="gradingStatus" class="status ok">BAIK</div>
+            </div>
+            <div class="card"><div class="card-head"><div><h3>Fokus Kematangan</h3><p>% Masak wajib jelas.</p></div></div><div id="gradingLiveCards" class="metric-grid"></div></div>
+            <div class="card">
+              <div class="card-head"><div><h3>Persentase & Potongan</h3><p>Semua kategori termasuk masak tampil lengkap.</p></div></div>
+              <div class="table-wrap"><table><thead><tr><th>Kategori</th><th>Jumlah</th><th>Persen</th><th>Potongan</th></tr></thead><tbody id="gradingBreakdown"></tbody></table></div>
+              <div id="gradingValidation" class="alert info">Isi form untuk mulai menghitung.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-td" class="page">
+        <div class="grid form-layout">
+          <div class="card sticky-card">
+            <div class="card-head"><div><h3>Input Tenera Dura</h3><p>Modul terpisah dari grading.</p></div></div>
+            <form id="tdForm" class="form-grid">
+              <label class="span-2"><span>Nama Sopir</span><input class="input" name="driver" list="tdDriverList" required /><datalist id="tdDriverList"></datalist></label>
+              <label><span>Plat</span><input class="input" name="plate" required /></label>
+              <label><span>Tenera</span><input class="input" name="tenera" type="number" min="0" value="0" required /></label>
+              <label><span>Dura</span><input class="input" name="dura" type="number" min="0" value="0" required /></label>
+              <div class="form-actions span-2">
+                <button type="button" id="copyLastTD" class="btn secondary">Copy Terakhir</button>
+                <button type="button" id="resetTDBtn" class="btn secondary">Reset</button>
+                <button type="submit" class="btn primary">Simpan Tenera Dura</button>
+              </div>
+            </form>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h3>Komposisi TD</h3><p>Tampilan besar dan mudah dibaca.</p></div></div>
+            <div class="metric-grid">
+              <div class="metric"><span>Total TD</span><strong id="tdTotal">0</strong></div>
+              <div class="metric"><span>% Tenera</span><strong id="tdPctTenera">0.00%</strong></div>
+              <div class="metric"><span>% Dura</span><strong id="tdPctDura">0.00%</strong></div>
+              <div class="metric"><span>Dominan</span><strong id="tdDominant">-</strong></div>
+            </div>
+            <div class="progress-group">
+              <label>Tenera</label><div class="progress"><div id="tdBarTenera" class="fill"></div></div>
+              <label>Dura</label><div class="progress"><div id="tdBarDura" class="fill alt"></div></div>
+            </div>
+            <div class="donut-wrap"><div id="tdDonut" class="donut"><span id="tdDonutText">0%</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-rekapGrading" class="page">
+        <div class="card">
+          <div class="card-head">
+            <div><h3>Rekap Grading</h3><p>Data grading lengkap dan terpisah dari TD.</p></div>
+            <div class="inline-actions">
+              <button id="sendGradingSummaryBtn" class="btn secondary">Kirim Ringkasan</button>
+              <button id="sendGradingDetailBtn" class="btn secondary">Kirim Detail</button>
+              <button id="exportGradingBtn" class="btn primary">Export Excel</button>
+            </div>
+          </div>
+          <div class="toolbar">
+            <input id="rekapGradingSearch" class="input" placeholder="Cari sopir, plat, supplier..." />
+            <select id="rekapGradingSupplier" class="input"></select>
+            <input id="rekapGradingStart" class="input" type="date" />
+            <input id="rekapGradingEnd" class="input" type="date" />
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Jam</th><th>Sopir</th><th>Plat</th><th>Supplier</th><th>Total Janjang</th><th>% Masak</th><th>Total Potongan</th><th>Revisi</th></tr></thead><tbody id="rekapGradingTable"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="page-rekapTD" class="page">
+        <div class="card">
+          <div class="card-head">
+            <div><h3>Rekap Tenera Dura</h3><p>Rekap TD berdiri sendiri.</p></div>
+            <div class="inline-actions">
+              <button id="sendTDSummaryBtn" class="btn secondary">Kirim Ringkasan</button>
+              <button id="sendTDDetailBtn" class="btn secondary">Kirim Detail</button>
+              <button id="exportTDBtn" class="btn primary">Export Excel</button>
+            </div>
+          </div>
+          <div class="toolbar">
+            <input id="rekapTDSearch" class="input" placeholder="Cari sopir atau plat..." />
+            <input id="rekapTDStart" class="input" type="date" />
+            <input id="rekapTDEnd" class="input" type="date" />
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Jam</th><th>Sopir</th><th>Plat</th><th>Tenera</th><th>Dura</th><th>% Tenera</th><th>% Dura</th><th>Revisi</th></tr></thead><tbody id="rekapTDTable"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="page-rekapData" class="page">
+        <div class="card">
+          <div class="card-head">
+            <div><h3>Rekap Data</h3><p>Kesimpulan otomatis berdasarkan tanggal yang dipilih.</p></div>
+            <div class="inline-actions">
+              <button id="rekapDataRunBtn" class="btn primary">Tampilkan Rekap</button>
+              <button id="rekapDataResetBtn" class="btn secondary">Reset</button>
+            </div>
+          </div>
+          <div class="toolbar">
+            <input id="rekapDataStart" class="input" type="date" />
+            <input id="rekapDataEnd" class="input" type="date" />
+            <select id="rekapDataSupplier" class="input"></select>
+            <input id="rekapDataDriver" class="input" placeholder="Filter sopir..." />
+          </div>
+        </div>
+        <div class="grid cols-2">
+          <div class="card"><div class="card-head"><div><h3>Kesimpulan Grading</h3><p>Ringkasan otomatis sesuai filter.</p></div><button id="waFilteredGradingBtn" class="btn secondary">WA</button></div><div id="rekapDataGradingSummary" class="stack"></div></div>
+          <div class="card"><div class="card-head"><div><h3>Kesimpulan Tenera Dura</h3><p>Ringkasan otomatis sesuai filter.</p></div><button id="waFilteredTDBtn" class="btn secondary">WA</button></div><div id="rekapDataTDSummary" class="stack"></div></div>
+        </div>
+        <div class="grid cols-2">
+          <div class="card"><div class="card-head"><div><h3>Per Supplier</h3><p>Evaluasi grading per supplier.</p></div></div><div class="table-wrap"><table><thead><tr><th>Supplier</th><th>Transaksi</th><th>Total Janjang</th><th>% Masak</th><th>Potongan</th></tr></thead><tbody id="rekapDataSupplierTable"></tbody></table></div></div>
+          <div class="card"><div class="card-head"><div><h3>Per Sopir</h3><p>Ringkasan grading dan TD per sopir.</p></div></div><div class="table-wrap"><table><thead><tr><th>Sopir</th><th>Grading</th><th>Total Janjang</th><th>% Masak</th><th>TD</th></tr></thead><tbody id="rekapDataDriverTable"></tbody></table></div></div>
+        </div>
+      </section>
+
+      <section id="page-sheetGrading" class="page staff-only-page">
+        <div class="card">
+          <div class="card-head"><div><h3>Spreadsheet Grading</h3><p>Satu kolom satu data seperti tarikan spreadsheet kerja.</p></div></div>
+          <div class="toolbar"><input id="sheetGradingSearch" class="input" placeholder="Filter spreadsheet grading..." /></div>
+          <div class="table-wrap spreadsheet"><table id="sheetGradingTable" class="sheet-table"></table></div>
+        </div>
+      </section>
+
+      <section id="page-sheetTD" class="page staff-only-page">
+        <div class="card">
+          <div class="card-head"><div><h3>Spreadsheet Tenera Dura</h3><p>Spreadsheet detail TD.</p></div></div>
+          <div class="toolbar"><input id="sheetTDSearch" class="input" placeholder="Filter spreadsheet TD..." /></div>
+          <div class="table-wrap spreadsheet"><table id="sheetTDTable" class="sheet-table"></table></div>
+        </div>
+      </section>
+
+      <section id="page-performance" class="page staff-only-page">
+        <div class="card">
+          <div class="card-head"><div><h3>Performance</h3><p>Ranking grading, TD, dan gabungan per supplier atau per sopir.</p></div></div>
+          <div class="toolbar">
+            <select id="performanceMode" class="input">
+              <option value="grading">Performance Grading</option>
+              <option value="td">Performance Tenera Dura</option>
+              <option value="combined">Performance Gabungan</option>
+            </select>
+            <select id="performanceView" class="input">
+              <option value="supplier">Per Supplier</option>
+              <option value="driver">Per Sopir</option>
+            </select>
+            <button id="waPerformanceSummaryBtn" class="btn secondary">WA Kesimpulan</button>
+            <button id="waPerformanceDataBtn" class="btn primary">WA Data</button>
+          </div>
+          <div class="table-wrap"><table><thead id="performanceHead"></thead><tbody id="performanceBody"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="page-analytics" class="page staff-only-page">
+        <div class="grid cols-2">
+          <div class="card"><div class="card-head"><div><h3>Penyebab Potongan</h3><p>Akumulasi kontribusi potongan per kategori.</p></div></div><div id="analyticsCauses" class="stack"></div></div>
+          <div class="card"><div class="card-head"><div><h3>Insight Manajerial</h3><p>Kesimpulan untuk evaluasi operasional.</p></div></div><div id="analyticsInsights" class="stack"></div></div>
+        </div>
+      </section>
+
+      <section id="page-supplier" class="page staff-only-page">
+        <div class="grid cols-2">
+          <div class="card sticky-card">
+            <div class="card-head"><div><h3>Master Supplier</h3><p>Tambah, edit, aktifkan, atau nonaktifkan supplier.</p></div></div>
+            <form id="supplierForm" class="form-grid">
+              <input type="hidden" name="supplierId" />
+              <label class="span-2"><span>Nama Supplier</span><input class="input" name="supplierName" required /></label>
+              <label class="span-2"><span>Status</span><select class="input" name="supplierStatus"><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select></label>
+              <div class="form-actions span-2">
+                <button type="button" id="resetSupplierBtn" class="btn secondary">Reset</button>
+                <button type="submit" class="btn primary">Simpan Supplier</button>
+              </div>
+            </form>
+          </div>
+          <div class="card"><div class="card-head"><div><h3>Daftar Supplier</h3><p>Dipakai pada input grading.</p></div></div><div id="supplierList" class="stack"></div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="detailModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head"><h3>Detail Transaksi</h3><button id="closeModalBtn" class="icon-btn">✕</button></div>
+      <div id="detailBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="waModal" class="modal">
+    <div class="modal-card modal-sm">
+      <div class="modal-head"><h3 id="waModalTitle">Kirim WhatsApp</h3><button id="closeWaModalBtn" class="icon-btn">✕</button></div>
+      <div class="modal-body">
+        <div class="form-grid single-mobile">
+          <label><span>Tanggal Awal</span><input id="waStart" class="input" type="date"></label>
+          <label><span>Tanggal Akhir</span><input id="waEnd" class="input" type="date"></label>
+          <label id="waSupplierWrap" class="span-2"><span>Supplier</span><select id="waSupplier" class="input"></select></label>
+          <label><span>Mode Rekap</span><select id="waMode" class="input"><option value="all">Rekap Keseluruhan</option><option value="driver">Rekap Per Sopir</option></select></label>
+          <label><span>Jenis Pesan</span><input id="waTypeText" class="input" readonly></label>
+        </div>
+        <div id="waPreview" class="wa-preview"></div>
+        <div class="form-actions"><button id="confirmWaBtn" class="btn primary">Buka WhatsApp</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
